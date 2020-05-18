@@ -8,4 +8,4 @@ A Beat Saber mod that allows you to draw in the scene
 **Preview**
 https://www.youtube.com/watch?v=e_fAMT1CF_U
 
-*Source code available after cleaning it up a little bit more*
+*Source code available after cleaning it up a little bit more (probably 0.1 release)*
