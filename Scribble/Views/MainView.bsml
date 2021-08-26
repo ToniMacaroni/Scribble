@@ -1,0 +1,106 @@
+﻿<vertical anchor-pos-y="-25" child-expand-height="false" child-control-height="false" spacing="2" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+
+  <horizontal horizontal-fit="PreferredSize" child-expand-width="false" child-expand-height="true" child-control-width="true" child-control-height="true" spacing="5">
+
+    <vertical pad-top="5">
+      <vertical spacing="2" preferred-width="12" child-control-height="true" child-control-width="true" child-expand-height="false" child-expand-width="false">
+        <button-with-icon id="picker-btn" stroke-type="Clean" preferred-width="12" preferred-height="12" on-click="selectPicker" click-event="show-picker" hover-hint="Color Picker" />
+        <button-with-icon id="eraser-btn" stroke-type="Clean" preferred-width="12" preferred-height="12" on-click="selectEraseMode" hover-hint="Eraser" />
+      </vertical>
+    </vertical>
+
+    <modal-color-picker id="color-picker-modal" value="brush-color-value" on-done="picker-selected-color" move-to-center="true" click-off-closes="true"></modal-color-picker>
+
+    <modal id='save-dialog' hide-event='save-dialog-hide' move-to-center="true" click-off-closes="true" size-delta-x="70" size-delta-y="80">
+      <vertical spacing="8" pad="5">
+        <vertical spacing='5'>
+          <list id='save-file-list' expand-cell='true' select-cell='file-save-selected' list-style='Box' />
+        </vertical>
+        <vertical  bg='round-rect-panel' bg-color='#00000000' preferred-height='180'>
+          <horizontal preferred-width='60'>
+            <page-button event-click='save-file-list#PageUp' direction='Up' />
+            <page-button event-click='save-file-list#PageDown' direction='Down' />
+          </horizontal>
+          <string-setting id='new-file-string' text='Name' value='save-file-name' on-change='save-file-name-changed' preferred-width='10' apply-on-change='true'></string-setting>
+          <horizontal>
+            <button text='Close' click-event='save-dialog-hide'/>
+            <button text='New' on-click='save-new'/>
+          </horizontal>
+        </vertical>
+      </vertical>
+    </modal>
+
+    <modal id='load-dialog' hide-event='load-dialog-hide' move-to-center="true" click-off-closes="true" size-delta-x="70" size-delta-y="70">
+      <vertical spacing="10" pad="5">
+        <vertical spacing='5'>
+          <list id='load-file-list' expand-cell='true' select-cell='file-load-selected' list-style='Box' />
+        </vertical>
+        <horizontal preferred-width='60' bg='round-rect-panel' bg-color='#00000000'>
+          <page-button event-click='load-file-list#PageUp' direction='Up' />
+          <page-button event-click='load-file-list#PageDown' direction='Down' />
+        </horizontal>
+        <button text='Close' click-event='load-dialog-hide'/>
+      </vertical>
+    </modal>
+
+    <vertical preferred-height='60' preferred-width='35'>
+      <text font-align='Center' size-delta-y='10' text='Brushes'/>
+      <page-button event-click='brushList#PageUp' direction='Up' />
+      <custom-list id='brushList' contents='brushes' visible-cells='5' cell-size='10' select-cell='brush-selected'>
+        <stack vertical-fit='Unconstrained'>
+          <raw-image id='HoveredBackground' tags='hovered' />
+          <raw-image id='SelectedBackground' tags='selected' />
+          <horizontal pad='2' spacing='2' child-expand-width='false' vertical-fit='Unconstrained'>
+            <raw-image id='ColorImage' pref-width='6'/>
+            <vertical horizontal-fit='Unconstrained'>
+              <text text='~Name' align='MidlineLeft' font-size='4' />
+              <text id='HexColorText' text='~HexColor' color='#777' align='MidlineLeft' font-size='3' />
+            </vertical>
+          </horizontal>
+        </stack>
+      </custom-list>
+      <page-button event-click='brushList#PageDown' direction='Down' />
+    </vertical>
+
+    <vertical preferred-height='60' preferred-width='35' >
+      <text font-align='Center' size-delta-y='10' text='Textures'/>
+      <page-button event-click='textureList#PageUp' direction='Up' />
+      <custom-list id='textureList' contents='textures' visible-cells='5' cell-size='10' select-cell='texture-selected'>
+        <stack vertical-fit='Unconstrained'>
+          <raw-image id='HoveredBackground' tags='hovered' />
+          <raw-image id='SelectedBackground' tags='selected' />
+          <horizontal pad='2' spacing='2' child-expand-width='false' vertical-fit='Unconstrained'>
+            <raw-image id='TextureImage' pref-width='6'/>
+            <vertical horizontal-fit='Unconstrained'>
+              <text text='~Name' align='MidlineLeft' font-size='4' />
+            </vertical>
+          </horizontal>
+        </stack>
+      </custom-list>
+      <page-button event-click='textureList#PageDown' direction='Down' />
+    </vertical>
+
+    <vertical preferred-height='60' preferred-width='35' >
+      <text font-align='Center' size-delta-y='10' text='Effects'/>
+      <page-button event-click='effectsList#PageUp' direction='Up' />
+      <custom-list id='effectsList' contents='effects' visible-cells='5' cell-size='10' select-cell='effect-selected'>
+        <stack vertical-fit='Unconstrained'>
+          <raw-image id='HoveredBackground' tags='hovered' />
+          <raw-image id='SelectedBackground' tags='selected' />
+          <horizontal pad='2' spacing='2' child-expand-width='false' vertical-fit='Unconstrained'>
+            <raw-image id='EffectImage' pref-width='15'/>
+            <vertical horizontal-fit='Unconstrained'>
+              <text text='~Name' align='MidlineLeft' font-size='4' />
+            </vertical>
+          </horizontal>
+        </stack>
+      </custom-list>
+      <page-button event-click='effectsList#PageDown' direction='Down' />
+    </vertical>
+
+  </horizontal>
+  <vertical child-expand-height="false" child-control-height="false" spacing="2" pad-left='40' pad-right='20'>
+    <slider-setting id='SizeSlider' text='Brush Size' min='1' max='70' increment='1' integer-only='false' apply-on-change='true' value='Size' />
+    <slider-setting id='GlowSlider' text='Glow Amount' min='0' max='1' increment='0.05' integer-only='false' apply-on-change='true' value='Glow' />
+  </vertical>
+</vertical>
