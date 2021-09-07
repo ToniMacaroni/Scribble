@@ -7,34 +7,81 @@ using UnityEngine;
 
 namespace Scribble
 {
-    internal class InputManager : MonoBehaviour
+    internal class VrInputManager : InputManager
     {
         public SaberType SaberType;
 
+        private string _inputString;
+
+        protected override void Start()
+        {
+            _inputString = SaberType == SaberType.SaberA ? "TriggerLeftHand" : "TriggerRightHand";
+            //Debug.LogError("VR Input Manager Initialized");
+        }
+
+        protected override void Update()
+        {
+            float triggerValue = Input.GetAxis(_inputString);
+            if (triggerValue > 0.8f && UpTriggered)
+            {
+                UpTriggered = false;
+                InvokeButtonPressed();
+            }
+            else if (triggerValue < 0.8f && !UpTriggered)
+            {
+                UpTriggered = true;
+                InvokeButtonReleased();
+            }
+        }
+    }
+
+    internal class MouseInputManager : InputManager
+    {
+        public int ButtonIdx = 0;
+
+        protected override void Start()
+        {
+            //Debug.LogError("Mouse Input Manager Initialized");
+        }
+
+        protected override void Update()
+        {
+            if (Input.GetMouseButton(ButtonIdx) && UpTriggered)
+            {
+                UpTriggered = false;
+                InvokeButtonPressed();
+            }
+            else if (Input.GetMouseButtonUp(ButtonIdx) && !UpTriggered)
+            {
+                UpTriggered = true;
+                InvokeButtonReleased();
+            }
+        }
+    }
+
+    internal class InputManager : MonoBehaviour
+    {
         public event Action ButtonPressed;
         public event Action ButtonReleased;
 
-        private string _inputString;
-        private bool _upTriggered = true;
+        protected bool UpTriggered = true;
 
-        void Start()
+        protected virtual void Start()
         {
-            _inputString = SaberType==SaberType.SaberA ? "TriggerLeftHand" : "TriggerRightHand";
-            Plugin.Log.Debug("Input Manager Initialized");
         }
 
-        void Update()
+        protected void InvokeButtonPressed()
         {
-            float triggerValue = Input.GetAxis(_inputString);
-            if (triggerValue > 0.8f && _upTriggered)
-            {
-                _upTriggered = false;
-                ButtonPressed?.Invoke();
-            }else if (triggerValue < 0.8f && !_upTriggered)
-            {
-                _upTriggered = true;
-                ButtonReleased?.Invoke();
-            }
+            ButtonPressed?.Invoke();
+        }
+
+        protected void InvokeButtonReleased()
+        {
+            ButtonReleased?.Invoke();
+        }
+
+        protected virtual void Update()
+        {
         }
     }
 }

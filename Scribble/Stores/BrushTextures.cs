@@ -2,31 +2,35 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 
-namespace Scribble
+namespace Scribble.Stores
 {
-    internal class BrushTextures
+    internal class BrushTextures : IInitializable
     {
-        public static List<BrushTexture> Textures = new List<BrushTexture>();
+        public List<BrushTexture> Textures = new List<BrushTexture>();
 
-        public static void LoadTextures()
+        public void Initialize()
+        {
+            LoadTextures();
+        }
+
+        public void LoadTextures()
         {
             LoadTexturesFromResources();
             LoadTexturesFromDirectory();
         }
 
-        public static void LoadTexturesFromResources()
+        public void LoadTexturesFromResources()
         {
-            AddTexture("standard", Tools.LoadTextureFromResources("Textures.standard.png", false));
+            AddTexture("standard", CommonHelpers.LoadTextureFromResources("Textures.standard.png", false));
 
-            AddTexture("pogchamp", Tools.LoadTextureFromResources("Textures.pogchamp.png"));
-            AddTexture("brush", Tools.LoadTextureFromResources("Textures.brush.png"));
+            AddTexture("pogchamp", CommonHelpers.LoadTextureFromResources("Textures.pogchamp.png"));
+            AddTexture("brush", CommonHelpers.LoadTextureFromResources("Textures.brush.png"));
         }
 
-        public static void LoadTexturesFromDirectory()
+        public void LoadTexturesFromDirectory()
         {
             var dir = new DirectoryInfo("UserData\\Scribble\\Textures");
             if (!dir.Exists)
@@ -38,18 +42,18 @@ namespace Scribble
             foreach (FileInfo fileInfo in dir.GetFiles("*.png"))
             {
                 string name = fileInfo.FilenameWithoutExtension();
-                Texture2D tex = Tools.LoadTextureFromFile(fileInfo.FullName);
+                Texture2D tex = CommonHelpers.LoadTextureFromFile(fileInfo.FullName);
                 AddTexture(name, tex);
             }
         }
 
-        private static void AddTexture(string name, Texture2D tex)
+        private void AddTexture(string name, Texture2D tex)
         {
             tex.wrapMode = TextureWrapMode.Repeat;
             Textures.Add(new BrushTexture(name, tex));
         }
 
-        public static Texture2D GetTexture(string name)
+        public Texture2D GetTexture(string name)
         {
             if (string.Equals(name, "standard", StringComparison.OrdinalIgnoreCase)) return null;
             return Textures.FirstOrDefault(tex => tex.Name == name)?.Texture;

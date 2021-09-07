@@ -95,7 +95,7 @@ namespace Scribble
             }
             catch (EndOfStreamException ex)
             {
-                Plugin.Log.Debug(ex.Message);
+                Debug.LogError(ex.Message);
                 stream.Seek(position, SeekOrigin.Begin);
                 return false;
             }

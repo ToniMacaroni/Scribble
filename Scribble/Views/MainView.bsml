@@ -1,17 +1,19 @@
-﻿<vertical anchor-pos-y="-25" child-expand-height="false" child-control-height="false" spacing="2" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+﻿<vertical anchor-pos-y="-25" pref-height="40" child-expand-height="false" child-control-height="false" spacing="2" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
 
   <horizontal horizontal-fit="PreferredSize" child-expand-width="false" child-expand-height="true" child-control-width="true" child-control-height="true" spacing="5">
 
     <vertical pad-top="5">
       <vertical spacing="2" preferred-width="12" child-control-height="true" child-control-width="true" child-expand-height="false" child-expand-width="false">
-        <button-with-icon id="picker-btn" stroke-type="Clean" preferred-width="12" preferred-height="12" on-click="selectPicker" click-event="show-picker" hover-hint="Color Picker" />
-        <button-with-icon id="eraser-btn" stroke-type="Clean" preferred-width="12" preferred-height="12" on-click="selectEraseMode" hover-hint="Eraser" />
+        <button-with-icon id="picker-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" on-click="selectPicker" click-event="show-picker" hover-hint="Color Picker" />
+        <button-with-icon id="eraser-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Eraser" />
+        <button-with-icon id="move-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Move" />
+        <button-with-icon id="bucket-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Bucket" />
       </vertical>
     </vertical>
 
-    <modal-color-picker id="color-picker-modal" value="brush-color-value" on-done="picker-selected-color" move-to-center="true" click-off-closes="true"></modal-color-picker>
+    <modal-color-picker id="color-picker-modal" tags="custom-modal" value="brush-color-value" on-done="picker-selected-color" move-to-center="true" click-off-closes="true"></modal-color-picker>
 
-    <modal id='save-dialog' hide-event='save-dialog-hide' move-to-center="true" click-off-closes="true" size-delta-x="70" size-delta-y="80">
+    <modal id='save-dialog' tags='custom-modal' hide-event='save-dialog-hide' move-to-center="true" click-off-closes="true" size-delta-x="70" size-delta-y="80">
       <vertical spacing="8" pad="5">
         <vertical spacing='5'>
           <list id='save-file-list' expand-cell='true' select-cell='file-save-selected' list-style='Box' />
@@ -23,14 +25,14 @@
           </horizontal>
           <string-setting id='new-file-string' text='Name' value='save-file-name' on-change='save-file-name-changed' preferred-width='10' apply-on-change='true'></string-setting>
           <horizontal>
-            <button text='Close' click-event='save-dialog-hide'/>
-            <button text='New' on-click='save-new'/>
+            <button text='Close' tags='custom-button' click-event='save-dialog-hide' pref-width='20' pref-height='10'/>
+            <button text='New' tags='custom-button' on-click='save-new' pref-width='20' pref-height='10'/>
           </horizontal>
         </vertical>
       </vertical>
     </modal>
 
-    <modal id='load-dialog' hide-event='load-dialog-hide' move-to-center="true" click-off-closes="true" size-delta-x="70" size-delta-y="70">
+    <modal id='load-dialog' tags='custom-modal' hide-event='load-dialog-hide' move-to-center="true" click-off-closes="true" size-delta-x="70" size-delta-y="70">
       <vertical spacing="10" pad="5">
         <vertical spacing='5'>
           <list id='load-file-list' expand-cell='true' select-cell='file-load-selected' list-style='Box' />
@@ -39,11 +41,19 @@
           <page-button event-click='load-file-list#PageUp' direction='Up' />
           <page-button event-click='load-file-list#PageDown' direction='Down' />
         </horizontal>
-        <button text='Close' click-event='load-dialog-hide'/>
+        <button text='Close' tags='custom-button' click-event='load-dialog-hide' pref-height='10' pref-width='50'/>
       </vertical>
     </modal>
 
-    <vertical preferred-height='60' preferred-width='35'>
+    <modal id='settings-modal' hide-event='settings-modal-hide' tags='custom-modal' move-to-center='true' click-off-closes="true" size-delta-y="40">
+      <vertical spacing='5' bg='round-rect-panel' bg-color='#fff' pref-width='70' pad='5'>
+        <checkbox text='Show drawing in map' value='ShowInMap' apply-on-change='true'/>
+        <checkbox text='Load drawings animated' value='LoadDrawingsAnimated' apply-on-change='true'/>
+        <button text='Close' click-event='settings-modal-hide' tags='custom-button'/>
+      </vertical>
+    </modal>
+
+    <vertical preferred-width='35'>
       <text font-align='Center' size-delta-y='10' text='Brushes'/>
       <page-button event-click='brushList#PageUp' direction='Up' />
       <custom-list id='brushList' contents='brushes' visible-cells='5' cell-size='10' select-cell='brush-selected'>
@@ -62,7 +72,7 @@
       <page-button event-click='brushList#PageDown' direction='Down' />
     </vertical>
 
-    <vertical preferred-height='60' preferred-width='35' >
+    <vertical preferred-width='35' >
       <text font-align='Center' size-delta-y='10' text='Textures'/>
       <page-button event-click='textureList#PageUp' direction='Up' />
       <custom-list id='textureList' contents='textures' visible-cells='5' cell-size='10' select-cell='texture-selected'>
@@ -80,7 +90,7 @@
       <page-button event-click='textureList#PageDown' direction='Down' />
     </vertical>
 
-    <vertical preferred-height='60' preferred-width='35' >
+    <vertical preferred-width='35' >
       <text font-align='Center' size-delta-y='10' text='Effects'/>
       <page-button event-click='effectsList#PageUp' direction='Up' />
       <custom-list id='effectsList' contents='effects' visible-cells='5' cell-size='10' select-cell='effect-selected'>
@@ -100,7 +110,12 @@
 
   </horizontal>
   <vertical child-expand-height="false" child-control-height="false" spacing="2" pad-left='40' pad-right='20'>
-    <slider-setting id='SizeSlider' text='Brush Size' min='1' max='70' increment='1' integer-only='false' apply-on-change='true' value='Size' />
+    <slider-setting id='SizeSlider' text='CurrentBrush Size' min='1' max='70' increment='1' integer-only='false' apply-on-change='true' value='Size' />
     <slider-setting id='GlowSlider' text='Glow Amount' min='0' max='1' increment='0.05' integer-only='false' apply-on-change='true' value='Glow' />
+    <button id='stop-animation-button' text='Stop Animation' on-click='stop-animation' tags='custom-button'
+            ignore-layout='true'
+            anchor-pos-x='110'
+            anchor-pos-y='-23.7'
+            pref-height='10' />
   </vertical>
 </vertical>

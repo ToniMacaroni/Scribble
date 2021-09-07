@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using BS_Utils.Utilities;
 using HMUI;
+using IPA.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,14 +36,6 @@ namespace Scribble
             return textComp;
         }
 
-        public static void SetRaycasterCamera(GameObject go, Canvas canvas = null)
-        {
-            var raycaster = go.GetComponent<VRGraphicRaycaster>();
-            if (!raycaster) raycaster = go.AddComponent<VRGraphicRaycaster>();
-            raycaster.SetField("_eventCamera", Camera.main);
-            if(canvas!=null) raycaster.SetField("_canvas", canvas);
-        }
-
         public static Image CreateImage(this RectTransform parent, Vector2 anchoredPosition, Vector2 sizeDelta)
         {
             var image_go = new GameObject("Image");
@@ -69,10 +61,10 @@ namespace Scribble
             return new ScribbleUISlider(go);
         }
 
-        public static ScribbleUISimpleButton CreateSimpleButton(this Transform parent, string text)
+        public static ScribbleUISimpleButton CreateSimpleButton(this Transform parent, string text, ButtonColors? buttonColors = null)
         {
             GameObject go = parent.CreateFromInstance("ApplyButton");
-            return new ScribbleUISimpleButton(go, text);
+            return new ScribbleUISimpleButton(go, text, buttonColors);
         }
 
         public static ScribbleUICheckbox CreateCheckbox(this Transform parent)

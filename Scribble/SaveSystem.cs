@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using BeatSaberMarkupLanguage.Macros;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Scribble
 {
-
-    internal static class SaveSystem
+    internal class SaveSystem
     {
-        public static DirectoryInfo SaveDirectory = new DirectoryInfo("UserData\\Scribble\\Drawings");
+        private readonly PluginConfig _config;
+        public const int Version = 1;
 
-        public static int Version = 1;
+        public DirectoryInfo SaveDirectory;
 
-        public static DrawingData LoadPng(FileInfo file)
+        public SaveSystem(PluginDirectories dirs, PluginConfig config)
+        {
+            _config = config;
+            SaveDirectory = dirs.DrawingsDir;
+        }
+
+        public DrawingData LoadPng(FileInfo file)
         {
             if (!file.Exists) return null;
             BinaryReader reader = new BinaryReader(file.OpenRead());
@@ -27,7 +28,7 @@ namespace Scribble
             return Load(reader);
         }
 
-        public static DrawingData LoadPngFromResource(string name)
+        public DrawingData LoadPngFromResource(string name)
         {
             Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Scribble.Drawings." + name + ".png");
             if (stream == null) return null;
@@ -36,10 +37,10 @@ namespace Scribble
             return Load(reader);
         }
 
-        public static void SavePng(FileInfo file, DrawingData data)
+        public void SavePng(FileInfo file, DrawingData data)
         {
             Camera cam = ThumbnailHelper.CreateCamera(new Vector3(1.3676883f, 1.674314f, -2.518276f), new Vector3(12.04695f, 341.8893f, 3.806141f));
-            byte[] pngData = ThumbnailHelper.GetThumbnail(cam, PluginConfig.Instance.ThumbnailSize, PluginConfig.Instance.ThumbnailSize);
+            byte[] pngData = ThumbnailHelper.GetThumbnail(cam, _config.ThumbnailSize, _config.ThumbnailSize);
             cam.gameObject.Destroy();
             file.Directory.Create();
             BinaryWriter writer = new BinaryWriter(file.OpenWrite());
@@ -47,11 +48,10 @@ namespace Scribble
             Save(writer, data);
         }
 
-        public static void Save(BinaryWriter writer, DrawingData data)
+        public void Save(BinaryWriter writer, DrawingData data)
         {
             try
             {
-                //Version
                 writer.Write(Version);
 
                 BinaryFormatter formatter = new BinaryFormatter();
@@ -60,42 +60,42 @@ namespace Scribble
             }
             catch (Exception e)
             {
-                Plugin.Log.Debug(e.Message);
+                Debug.LogError(e.Message);
             }
         }
 
-        public static DrawingData LoadFromFile(FileInfo file)
+        public DrawingData LoadFromFile(FileInfo file)
         {
             if (!file.Exists) return null;
             return Load(new BinaryReader(file.OpenRead()));
         }
 
-        public static DrawingData LoadFromResource(string name)
+        public DrawingData LoadFromResource(string name)
         {
             Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
             if (stream == null) return null;
             return Load(new BinaryReader(stream));
         }
 
-        public static DrawingData Load(BinaryReader reader)
+        public DrawingData Load(BinaryReader reader)
         {
             try
             {
                 int version = reader.ReadInt32();
                 if (version != Version)
                 {
-                    Plugin.Log.Debug("Trying to load drawing with another version");
+                    Debug.LogError("Trying to load drawing with another version");
                     return null;
                 }
 
                 BinaryFormatter formatter = new BinaryFormatter();
-                DrawingData result = (DrawingData) formatter.Deserialize(reader.BaseStream);
+                DrawingData result = (DrawingData)formatter.Deserialize(reader.BaseStream);
                 reader.Close();
                 return result;
             }
             catch (Exception e)
             {
-                Plugin.Log.Debug(e.Message);
+                Debug.LogError(e.Message);
             }
 
             return null;
@@ -136,11 +136,12 @@ namespace Scribble
             public SerializableLineRendererData(ScribbleContainer.LinerendererData data)
             {
                 Vector3[] positions = new Vector3[data.LineRenderer.positionCount];
+                var relPos = data.LineRenderer.transform.position;
                 data.LineRenderer.GetPositions(positions);
                 Positions = new SerializableVector3[positions.Length];
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    Positions[i] = new SerializableVector3(positions[i]);
+                    Positions[i] = new SerializableVector3(positions[i] + relPos);
                 }
                 Brush = new SerializableBrush(data.Brush);
             }

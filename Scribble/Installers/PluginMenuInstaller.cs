@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Scribble.UI;
+using SiraUtil;
+using UnityEngine;
+using VRUIControls;
 using Zenject;
 
 namespace Scribble.Installers
@@ -7,23 +10,22 @@ namespace Scribble.Installers
     {
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<ControllerGetter>().AsSingle();
-        }
-    }
+            BrushBehaviour.Install(Container);
+            Container.BindInterfacesAndSelfTo<MenuBrushManager>().AsSingle();
 
-    internal class ControllerGetter : IInitializable
-    {
-        private readonly MenuPlayerController _menuPlayerController;
+            Container
+                .BindFactory<GameObject, VRGraphicRaycaster, RaycasterFactory>()
+                .FromFactory<CustomRaycasterFactory>();
 
-        public ControllerGetter(MenuPlayerController menuPlayerController)
-        {
-            _menuPlayerController = menuPlayerController;
-        }
+            Container
+                .BindFactory<GameObject, HMUI.Screen, ScreenFactory>()
+                .FromFactory<CustomScreenFactory>();
 
-        public void Initialize()
-        {
-            Debug.LogError("Found");
-            Debug.LogError(_menuPlayerController != null);
+            CustomViewControllerFactory.Install(Container);
+
+            Container.BindInterfacesAndSelfTo<ScribbleUI>().FromNewComponentOnNewGameObject().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<MenuInitializer>().AsSingle();
         }
     }
 }

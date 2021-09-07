@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using HMUI;
+using IPA.Utilities;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Scribble
 {
-    public static class Tools
+    public static class CommonHelpers
     {
         public static Texture2D LoadTextureFromResources(string iconName, bool mipChain = true)
         {
@@ -28,6 +30,11 @@ namespace Scribble
         public static Sprite ToSprite(this Texture2D tex)
         {
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0f, 0f), 100f);
+        }
+
+        public static void SetSkew(this ImageView image, float skew)
+        {
+            SkewAcc(ref image) = skew;
         }
 
         public static Texture2D LoadTextureFromFile(string filename, bool mipChain = true)
@@ -79,5 +86,8 @@ namespace Scribble
 
             return instance;
         }
+
+        private static readonly FieldAccessor<ImageView, float>.Accessor SkewAcc =
+            FieldAccessor<ImageView, float>.GetAccessor("_skew");
     }
 }
