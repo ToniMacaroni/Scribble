@@ -9,26 +9,32 @@ using UnityEngine;
 
 namespace Scribble
 {
-    public static class AssetLoader
+    public class AssetLoader : IDisposable
     {
-        public static AssetBundle Assets;
+        private AssetBundle _assetBundle;
 
-        public static void Load()
+        public bool Load()
         {
             Stream stream = Assembly.GetExecutingAssembly()
                 .GetManifestResourceStream("Scribble.Resources.scribbleassets");
             if (stream == null)
             {
-                Plugin.Log.Debug("Couldn't load AssetBundle from Stream");
-                return;
+                Debug.LogError("Couldn't load AssetBundle from Stream");
+                return false;
             }
-            Assets = AssetBundle.LoadFromStream(stream);
+            _assetBundle = AssetBundle.LoadFromStream(stream);
             stream.Close();
+            return true;
         }
 
-        public static T LoadAsset<T>(string name) where T : UnityEngine.Object
+        public T LoadAsset<T>(string name) where T : UnityEngine.Object
         {
-            return Assets.LoadAsset<T>(name);
+            return _assetBundle.LoadAsset<T>(name);
+        }
+
+        public void Dispose()
+        {
+            _assetBundle.Unload(true);
         }
     }
 }
