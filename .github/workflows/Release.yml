@@ -1,0 +1,50 @@
+name: Release Scribble
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: GetStrippedRefs
+      env:
+        FILES_URL: ${{ secrets.BSFILES_URL }}
+      run: wget --no-check-certificate "$FILES_URL" -q -O bsfiles.zip
+    - name: ExtractRefs
+      run: unzip -q -n bsfiles.zip -d ./Refs
+    - name: Build
+      id: Build
+      env: 
+        FrameworkPathOverride: /usr/lib/mono/4.7.2-api
+      run: dotnet build --configuration Release
+    - name: Echo Filename
+      run: echo "$BUILDTEXT ($ASSEMBLYNAME)"
+      env:
+        BUILDTEXT: Filename=${{ steps.Build.outputs.filename }}
+        ASSEMBLYNAME: AssemblyName=${{ steps.Build.outputs.assemblyname }}
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        filename: '${{ steps.Build.outputs.filename }}.zip'
+        directory: Scribble/bin/Release/Final
+    - name: Set tag output
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        name: Scribble ${{ steps.vars.outputs.tag }}
+        artifacts: Scribble/bin/Release/Final/${{ steps.Build.outputs.filename }}.zip
+        bodyFile: changelog.md
+        token: ${{ secrets.GITHUB_TOKEN }}
+        allowUpdates: true
+        prerelease: true
