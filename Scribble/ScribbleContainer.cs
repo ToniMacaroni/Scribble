@@ -7,6 +7,7 @@ using HarmonyLib;
 using Scribble.Helpers;
 using Scribble.Installers;
 using Scribble.Stores;
+using SiraUtil.Logging;
 using SiraUtil.Tools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -58,6 +59,8 @@ namespace Scribble
             SetContext(_config.VisibleDuringPlay);
 
             //MakeObject(@"C:\Users\Julian\Desktop\LineArt.obj");
+            // LoadBundle();
+            // return;
 
             if (_config.FirstTimeLaunch)
             {
@@ -69,6 +72,17 @@ namespace Scribble
                 if (!file.Exists) return;
                 Load(file);
             }
+        }
+
+        public void LoadBundle()
+        {
+            var data = File.ReadAllBytes("/home/julian/Desktop/Bundle/BSData");
+            var bundle = AssetBundle.LoadFromMemory(data);
+            var prefab = bundle.LoadAsset<GameObject>("MatSphere");
+            var go = Instantiate(prefab);
+            go.transform.position = new Vector3(0, 1, 0);
+            DontDestroyOnLoad(go);
+            Debug.Log("Loaded bundle");
         }
 
         public void SetContext(bool showInGame)
@@ -214,16 +228,16 @@ namespace Scribble
         // sus model import
         public async void MakeObject(string fileName)
         {
-            var data = _saveSystem.LoadPng(_saveSystem.SaveDirectory.GetFile(_config.AutoLoadDrawing));
+            var data = _saveSystem.LoadPngFromResource("first");
             var brush = data.LineRendererData[0].Brush.ToCustomBrush();
-            //brush.ColorString = "#34ebd2";
-            //brush.Glow = 0.8f;
-            //brush.Size = 3;
-
             brush.ColorString = "#34ebd2";
-            brush.Glow = 0;
-            brush.Size = 23;
-            brush.EffectName = "DotBPM";
+            brush.Glow = 0.8f;
+            brush.Size = 3;
+
+            // brush.ColorString = "#34ebd2";
+            // brush.Glow = 0;
+            // brush.Size = 23;
+            // brush.EffectName = "DotBPM";
 
             var str = File.ReadAllText(fileName);
 
@@ -468,7 +482,7 @@ namespace Scribble
         public void OnGameStarted()
         {
             BeatmapObjectSpawnController spawnController = FindObjectOfType<BeatmapObjectSpawnController>();
-            UpdateMaterials(spawnController.currentBpm / 60);
+            // UpdateMaterials(spawnController.currentBpm / 60);
         }
 
         public void Dispose()

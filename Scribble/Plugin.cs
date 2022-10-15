@@ -4,7 +4,6 @@ using IPA.Loader;
 using Scribble.Installers;
 using SiraUtil.Zenject;
 using Config = IPA.Config.Config;
-using Logger = IPA.Logging.Logger;
 
 namespace Scribble
 {
@@ -13,10 +12,10 @@ namespace Scribble
     {
 
         [Init]
-        public Plugin(Logger logger, Config config, Zenjector zenjector, PluginMetadata metadata)
+        public Plugin(Config config, Zenjector zenjector, PluginMetadata metadata)
         {
-            zenjector.OnApp<PluginAppInstaller>().WithParameters(logger, config.Generated<PluginConfig>(), metadata);
-            zenjector.OnMenu<PluginMenuInstaller>();
+            zenjector.Install<PluginAppInstaller>(Location.App, config.Generated<PluginConfig>(), metadata);
+            zenjector.Install<PluginMenuInstaller>(Location.Menu);
         }
 
         [OnEnable]

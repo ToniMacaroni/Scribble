@@ -6,6 +6,7 @@ using IPA.Utilities;
 using Scribble.Installers;
 using Scribble.Stores;
 using Scribble.Tools;
+using SiraUtil.Logging;
 using SiraUtil.Tools;
 using UnityEngine;
 using UnityEngine.EventSystems;
