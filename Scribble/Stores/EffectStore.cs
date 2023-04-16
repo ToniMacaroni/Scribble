@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Scribble.Effects;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Scribble.Stores
 {
@@ -12,6 +13,8 @@ namespace Scribble.Stores
         private readonly AssetLoader _assetLoader;
         private readonly BrushTextures _brushTextures;
         public List<Effect> EffectsList = new List<Effect>();
+        
+        public Material BrushDrawerMaterial { get; private set; }
 
         public EffectStore(AssetLoader assetLoader, BrushTextures brushTextures)
         {
@@ -25,10 +28,12 @@ namespace Scribble.Stores
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(x=>x.BaseType==typeof(Effect)))
             {
                 if(!(type.GetCustomAttribute<EffectAttribute>() is {} attr)) continue;
-                var shader = _assetLoader.LoadAsset<Shader>("assets/shaders/"+attr.ShaderPath);
+                var shader = _assetLoader.LoadAsset<Shader>(attr.ShaderPath);
                 var effect = Activator.CreateInstance(type, shader, attr.ShaderName??type.Name.Replace("Effect", ""), _brushTextures);
                 EffectsList.Add((Effect)effect);
             }
+            
+            BrushDrawerMaterial = _assetLoader.LoadAsset<Material>("mat_brush");
         }
 
         public Effect GetEffect(string name)

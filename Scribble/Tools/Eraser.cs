@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Scribble.Helpers;
+using UnityEngine;
 
 namespace Scribble.Tools
 {
@@ -9,14 +10,18 @@ namespace Scribble.Tools
         private ScribbleContainer _container;
         private Vector3 _lastErasePosition;
 
-        private GameObject _brushMesh;
+        private BrushMeshDrawer _brushDrawer;
         private Material _brushMaterial;
+        
+        private bool _shouldRender;
+        
+        MaterialPropertyBlock _materialPropertyBlock = new MaterialPropertyBlock();
 
-        public void Init(GameObject brushMesh, ScribbleContainer container, SaberType saberType)
+        public void Init(BrushMeshDrawer brushDrawer, ScribbleContainer scribbleContainer, PluginConfig config, SaberType saberType)
         {
-            _brushMesh = brushMesh;
-            _container = container;
-            _brushMaterial = brushMesh.GetComponent<MeshRenderer>().material;
+            _brushDrawer = brushDrawer;
+            _container = scribbleContainer;
+            _brushMaterial = brushDrawer.Material;
         }
 
         public void OnSelected()
@@ -27,6 +32,7 @@ namespace Scribble.Tools
         public void OnDown(Vector3 _)
         {
             UpdateBrushMesh();
+            _shouldRender = true;
         }
 
         public void OnUpdate(Vector3 position)
@@ -40,7 +46,7 @@ namespace Scribble.Tools
 
         public void OnUp(Vector3 _)
         {
-            _brushMesh.SetActive(false);
+            _shouldRender = false;
         }
 
         public void OnDeselected()
@@ -50,9 +56,14 @@ namespace Scribble.Tools
 
         public void UpdateBrushMesh()
         {
-            _brushMesh.transform.localScale = new Vector3(EraserSize, EraserSize, EraserSize);
-            _brushMaterial.color = new Color(0.98f, 0.15f, 0.01f);
-            _brushMesh.SetActive(true);
+            _materialPropertyBlock.SetColor(MaterialPropertyHelper.PropColor, new Color(0,0,0,0));
+        }
+
+        public void Render()
+        {
+            if(!_shouldRender)
+                return;
+            _brushDrawer.DrawMesh(EraserSize, _materialPropertyBlock);
         }
     }
 }

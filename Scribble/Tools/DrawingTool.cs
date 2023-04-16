@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Scribble.Helpers;
+using UnityEngine;
 
 namespace Scribble.Tools
 {
@@ -7,21 +8,23 @@ namespace Scribble.Tools
         private const float MinDistance = 0.01f;
 
         private Vector3 _lastPoint;
-        private GameObject _brushMesh;
+        private BrushMeshDrawer _brushDrawer;
         private Material _brushMaterial;
         private ScribbleContainer _scribbleContainer;
         private SaberType _saberType;
         private BrushBehaviour.BrushBox _brushBox;
+        
+        private MaterialPropertyBlock _materialPropertyBlock = new MaterialPropertyBlock();
 
         private bool _isSelected;
 
-        public void Init(GameObject brushMesh, ScribbleContainer scribbleContainer, SaberType saberType)
+        public void Init(BrushMeshDrawer brushDrawer, ScribbleContainer scribbleContainer, PluginConfig config, SaberType saberType)
         {
-            _brushMesh = brushMesh;
+            _brushDrawer = brushDrawer;
             _scribbleContainer = scribbleContainer;
             _saberType = saberType;
 
-            _brushMaterial = _brushMesh.GetComponent<MeshRenderer>().material;
+            _brushMaterial = _brushDrawer.Material;
         }
 
         public void OnSelected()
@@ -54,9 +57,7 @@ namespace Scribble.Tools
 
         public void UpdateBrushMesh()
         {
-            float size = ScribbleContainer.LineWidth * _brushBox.CurrentBrush.Size;
-            _brushMesh.transform.localScale = new Vector3(size, size, size);
-            _brushMaterial.color = _brushBox.CurrentBrush.Color;
+            _materialPropertyBlock.SetColor(MaterialPropertyHelper.PropColor, _brushBox.CurrentBrush.Color);
         }
 
         public void OnDeselected()
@@ -73,6 +74,11 @@ namespace Scribble.Tools
         private void OnBrushChanged()
         {
             if(_isSelected) UpdateBrushMesh();
+        }
+
+        public void Render()
+        {
+            _brushDrawer.DrawMesh(ScribbleContainer.LineWidth * _brushBox.CurrentBrush.Size, _materialPropertyBlock);
         }
     }
 }

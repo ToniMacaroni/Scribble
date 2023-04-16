@@ -6,6 +6,7 @@ using IPA.Utilities;
 using Scribble.Installers;
 using Scribble.Stores;
 using Scribble.Tools;
+using SiraUtil.Logging;
 using SiraUtil.Tools;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -40,7 +41,7 @@ namespace Scribble
 
         public ITool PreviousTool { get; set; }
 
-        private GameObject _brushMesh;
+        private BrushMeshDrawer _brushMeshDrawer;
         private VRPointer _pointer;
         private InputManager _inputManager;
 
@@ -48,14 +49,17 @@ namespace Scribble
         private EffectStore _effects;
         private BrushStore _brushStore;
         private ScribbleContainer _container;
+        private PluginConfig _config;
         private bool _isFpfc;
         private Transform _transform;
         private Dictionary<string, ITool> _tools;
 
         private float _time;
         private bool _pressed;
+        private bool _shouldRender;
 
         private GameObject _menuHandle;
+        private MeshRenderer _pointerRenderer;
         private ITool _selectedTool;
         private readonly BrushBox _brushBox = new BrushBox();
 
@@ -68,6 +72,14 @@ namespace Scribble
                 if (_menuHandle) _menuHandle.SetActive(value);
             }
         }
+        
+        private bool PointerActive
+        {
+            set
+            {
+                if (_pointerRenderer) _pointerRenderer.enabled = value;
+            }
+        }
 
         [Inject]
         public void Construct(
@@ -75,15 +87,19 @@ namespace Scribble
             BrushStore brushStore,
             SiraLog logger,
             ScribbleContainer container,
-            LaunchOptions launchOptions)
+            LaunchOptions launchOptions,
+            BrushMeshDrawer brushMeshDrawer,
+            PluginConfig config)
         {
             _effects = effects;
             _brushStore = brushStore;
             _logger = logger;
             _container = container;
+            _config = config;
 
             _isFpfc = launchOptions.FPFC;
             _transform = transform;
+            _brushMeshDrawer = brushMeshDrawer;
         }
 
         private void Awake()
@@ -101,19 +117,20 @@ namespace Scribble
 
             SaberType = saberType;
             _pointer = pointer;
+            _pointerRenderer = _pointer.vrController.GetComponent<MeshRenderer>();
 
             _toolTypes ??= Assembly.GetExecutingAssembly().GetTypes().Where(x => typeof(ITool).IsAssignableFrom(x) && x!=typeof(ITool))
                 .ToList();
 
             _tools = new Dictionary<string, ITool>();
 
-            _brushMesh = CreateBrushMesh();
+            _brushMeshDrawer.SetTransform(_transform);
 
             foreach (var toolType in _toolTypes)
             {
                 var tool = (ITool)Activator.CreateInstance(toolType);
                 (tool as IBrushConsumer)?.SetBrushBox(_brushBox);
-                tool.Init(_brushMesh, _container, saberType);
+                tool.Init(_brushMeshDrawer, _container, _config, saberType);
                 _tools.Add(toolType.Name, tool);
             }
 
@@ -174,27 +191,31 @@ namespace Scribble
 
             if (CheckForUI()) return;
             if (!_container.DrawingEnabled) return;
-            MenuHandleActive = false;
 
             SelectedTool?.OnDown(GetPos());
 
             _pressed = true;
-            ShowBrushMesh(true);
+            SetRenderState(true);
         }
 
         private void OnRelease()
         {
-            MenuHandleActive = true;
+            SetRenderState(false);
+
             if (!_pressed) return;
 
             SelectedTool?.OnUp(GetPos());
 
             _pressed = false;
-            ShowBrushMesh(false);
         }
 
         private void Update()
         {
+            if (_shouldRender)
+            {
+                SelectedTool?.Render();
+            }
+            
             if (_pressed)
             {
                 SelectedTool?.OnUpdate(GetPos());
@@ -207,16 +228,7 @@ namespace Scribble
             }
 
             // visual queue for when you are able to draw
-            if (CheckForUI())
-            {
-                ShowBrushMesh(false);
-                MenuHandleActive = true;
-            }
-            else
-            {
-                ShowBrushMesh(true);
-                MenuHandleActive = false;
-            }
+            SetRenderState(!CheckForUI());
         }
 
         private Vector3 GetPos()
@@ -232,27 +244,16 @@ namespace Scribble
             return go.GetComponent<UIBehaviour>() is { };
         }
 
-        private GameObject CreateBrushMesh()
+        private void SetRenderState(bool shouldRender)
         {
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            go.transform.SetParent(_transform, false);
-            go.SetActive(false);
-            Material mat = new Material(_effects.GetEffect("Standard").Shader);
-            mat.color = new Color(1, 1, 1, 0.5f);
-            go.GetComponent<MeshRenderer>().material = mat;
-            return go;
-        }
-
-        public void ShowBrushMesh(bool show)
-        {
-            var mr = _pointer.vrController.gameObject.GetComponent<MeshRenderer>();
-            if (mr) mr.enabled = !show;
-            _brushMesh.SetActive(show);
+            _shouldRender = shouldRender;
+            MenuHandleActive = !shouldRender;
+            PointerActive = !shouldRender;
         }
 
         public static void Install(DiContainer container)
         {
-            container.BindFactory<GameObject, BrushBehaviour, BrushBehaviour.Factory>().FromFactory<CustomFactory>();
+            container.BindFactory<GameObject, BrushBehaviour, Factory>().FromFactory<CustomFactory>();
         }
 
         private static readonly FieldAccessor<VRPointer, PointerEventData>.Accessor PointerEventDataAcc

@@ -26,6 +26,8 @@ namespace Scribble.Installers
             Container.BindInterfacesAndSelfTo<ScribbleUI>().FromNewComponentOnNewGameObject().AsSingle();
 
             Container.BindInterfacesAndSelfTo<MenuInitializer>().AsSingle();
+            
+            Container.Resolve<Initializer>().Initialize();
         }
     }
 }

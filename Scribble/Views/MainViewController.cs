@@ -49,6 +49,8 @@ namespace Scribble.Views
         [UIComponent("eraser-btn")] private readonly Transform _eraserBtn = null;
         [UIComponent("picker-btn")] private readonly Transform _pickerBtn = null;
         [UIComponent("move-btn")] private readonly Transform _moveBtn = null;
+        [UIComponent("scale-btn")] private readonly Transform _scaleBtn = null;
+        [UIComponent("line-width-btn")] private readonly Transform _lineWidthBtn = null;
         [UIComponent("bucket-btn")] private readonly Transform _bucketBtn = null;
         [UIComponent("color-picker-modal")] public ModalView ColorPickerModal;
 
@@ -159,18 +161,21 @@ namespace Scribble.Views
         }
 
         [UIAction("file-save-selected")]
-        private void SaveSelectedFile(TableView _, int row)
+        private void SaveSelectedFile(TableView tableView, int row)
         {
             if (!_scribbleContainer) return;
             _scribbleContainer.Save(new FileInfo(FilePaths[row]));
+            tableView.ClearSelection();
             SaveModal.Hide(true);
         }
 
         [UIAction("file-load-selected")]
-        private void LoadSelectedFile(TableView _, int row)
+        private void LoadSelectedFile(TableView tableView, int row)
         {
             if (!_scribbleContainer) return;
             _scribbleContainer.Load(new FileInfo(FilePaths[row]));
+            tableView.ClearSelection();
+            LoadModal.Hide(true);
         }
 
         IEnumerator CrShowLoadingModal(ModalView modal, CustomListTableData customListTableData)
@@ -320,6 +325,8 @@ namespace Scribble.Views
 
             SetupTool(_eraserBtn, "Icons.eraser.png", typeof(Eraser));
             SetupTool(_moveBtn, "Icons.move.png", typeof(MoveTool));
+            SetupTool(_scaleBtn, "Icons.resize.png", typeof(ScaleTool));
+            SetupTool(_lineWidthBtn, "Icons.line-width.png", typeof(LineWidthTool));
             SetupTool(_bucketBtn, "Icons.bucket.png", typeof(BucketTool));
             SetupIconButton(_pickerBtn, "Icons.picker.png", out _);
 

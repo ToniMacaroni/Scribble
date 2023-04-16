@@ -4,9 +4,16 @@
 
     <vertical pad-top="5">
       <vertical spacing="2" preferred-width="12" child-control-height="true" child-control-width="true" child-expand-height="false" child-expand-width="false">
+        <button-with-icon id="move-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Move" />
+        <button-with-icon id="scale-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Scale" />
+        <button-with-icon id="line-width-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Line Width" />
+      </vertical>
+    </vertical>
+
+    <vertical pad-top="5" pad-left="4" pad-right="4">
+      <vertical spacing="2" preferred-width="12" child-control-height="true" child-control-width="true" child-expand-height="false" child-expand-width="false">
         <button-with-icon id="picker-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" on-click="selectPicker" click-event="show-picker" hover-hint="Color Picker" />
         <button-with-icon id="eraser-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Eraser" />
-        <button-with-icon id="move-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Move" />
         <button-with-icon id="bucket-btn" stroke-type="Clean" preferred-width="16" preferred-height="16" hover-hint="Bucket" />
       </vertical>
     </vertical>
@@ -53,7 +60,8 @@
       </vertical>
     </modal>
 
-    <vertical preferred-width='35'>
+<!--    Brush list-->
+    <vertical preferred-width='35' spacing="3">
       <text font-align='Center' size-delta-y='10' text='Brushes'/>
       <page-button event-click='brushList#PageUp' direction='Up' />
       <custom-list id='brushList' contents='brushes' visible-cells='5' cell-size='10' select-cell='brush-selected'>
@@ -72,7 +80,8 @@
       <page-button event-click='brushList#PageDown' direction='Down' />
     </vertical>
 
-    <vertical preferred-width='35' >
+<!--    Texture List-->
+    <vertical preferred-width='35' spacing="3">
       <text font-align='Center' size-delta-y='10' text='Textures'/>
       <page-button event-click='textureList#PageUp' direction='Up' />
       <custom-list id='textureList' contents='textures' visible-cells='5' cell-size='10' select-cell='texture-selected'>
@@ -90,7 +99,8 @@
       <page-button event-click='textureList#PageDown' direction='Down' />
     </vertical>
 
-    <vertical preferred-width='35' >
+<!--    Effect(Shader) List-->
+    <vertical preferred-width='35' spacing="3">
       <text font-align='Center' size-delta-y='10' text='Effects'/>
       <page-button event-click='effectsList#PageUp' direction='Up' />
       <custom-list id='effectsList' contents='effects' visible-cells='5' cell-size='10' select-cell='effect-selected'>
@@ -109,7 +119,7 @@
     </vertical>
 
   </horizontal>
-  <vertical child-expand-height="false" child-control-height="false" spacing="2" pad-left='40' pad-right='20'>
+  <vertical pad-top="2" child-expand-height="false" child-control-height="false" spacing="2" pad-left='40' pad-right='20'>
     <slider-setting id='SizeSlider' text='CurrentBrush Size' min='1' max='70' increment='1' integer-only='false' apply-on-change='true' value='Size' />
     <slider-setting id='GlowSlider' text='Glow Amount' min='0' max='1' increment='0.05' integer-only='false' apply-on-change='true' value='Glow' />
     <button id='stop-animation-button' text='Stop Animation' on-click='stop-animation' tags='custom-button'

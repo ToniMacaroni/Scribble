@@ -7,6 +7,7 @@ using HarmonyLib;
 using Scribble.Helpers;
 using Scribble.Installers;
 using Scribble.Stores;
+using SiraUtil.Logging;
 using SiraUtil.Tools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -57,7 +58,9 @@ namespace Scribble
 
             SetContext(_config.VisibleDuringPlay);
 
-            //MakeObject(@"C:\Users\Julian\Desktop\LineArt.obj");
+            //MakeSptObject(@"C:\Users\Julian\Desktop\Scribble_Points.spt");
+            // LoadBundle();
+            //return;
 
             if (_config.FirstTimeLaunch)
             {
@@ -69,6 +72,17 @@ namespace Scribble
                 if (!file.Exists) return;
                 Load(file);
             }
+        }
+
+        public void LoadBundle()
+        {
+            var data = File.ReadAllBytes("/home/julian/Desktop/Bundle/BSData");
+            var bundle = AssetBundle.LoadFromMemory(data);
+            var prefab = bundle.LoadAsset<GameObject>("MatSphere");
+            var go = Instantiate(prefab);
+            go.transform.position = new Vector3(0, 1, 0);
+            DontDestroyOnLoad(go);
+            Debug.Log("Loaded bundle");
         }
 
         public void SetContext(bool showInGame)
@@ -204,56 +218,79 @@ namespace Scribble
 
         public void Move(Vector3 pos)
         {
-            //transform.position = pos;
             foreach (Transform child in transform)
             {
                 child.position += pos;
             }
         }
 
-        // sus model import
-        public async void MakeObject(string fileName)
+        public void Scale(Vector3 pos)
         {
-            var data = _saveSystem.LoadPng(_saveSystem.SaveDirectory.GetFile(_config.AutoLoadDrawing));
-            var brush = data.LineRendererData[0].Brush.ToCustomBrush();
-            //brush.ColorString = "#34ebd2";
-            //brush.Glow = 0.8f;
-            //brush.Size = 3;
-
-            brush.ColorString = "#34ebd2";
-            brush.Glow = 0;
-            brush.Size = 23;
-            brush.EffectName = "DotBPM";
-
-            var str = File.ReadAllText(fileName);
-
-            var pts = new List<Vector3>();
-
-            var lines = str.Split('\n');
-
-            var multi = 0.65f;
-
-            for (int i = 0; i < lines.Length; i++)
+            foreach (Transform child in transform)
             {
-                var l = lines[i];
-                if (l.Length < 2 || l[0] != 'v' || l[1] != ' ')
-                {
-                    if (pts.Count < 1) continue;
-                    await AddLineRendererAnim(pts, brush);
-                    pts.Clear();
-                    continue;
-                }
+                child.localScale += pos;
+            }
+        }
 
-                var strPts = l.Split(' ');
-                if (strPts.Length < 4) continue;
-                var pt = new Vector3(float.Parse(strPts[1]) * multi, float.Parse(strPts[2]) * multi, float.Parse(strPts[3]) * multi);
-                if (pts.Count > 1 && Vector3.Distance(pt, pts[pts.Count - 1]) > 0.1f)
+        public void ScaleLineWidth(float multiplier)
+        {
+            foreach (var lr in _lineRenderers)
+            {
+                lr.LineRenderer.widthMultiplier += multiplier;
+                lr.Brush.Size += multiplier*(1/LineWidth);
+            }
+        }
+
+        public async void MakeSptObject(string filename)
+        {
+            var data = _saveSystem.LoadPngFromResource("first");
+            var brush = data.LineRendererData[0].Brush.ToCustomBrush();
+            brush.ColorString = "#303030";
+            brush.Glow = 0f;
+            brush.Size = 100;
+            brush.EffectName = "Lit";
+            
+            // brush.CustomEffectProperties = new Dictionary<string, string>
+            // {
+            //     { "_FogScale", "1" }
+            // };
+            
+            var str = File.ReadAllText(filename);
+            var lines = str.Split('\n');
+            
+            var pts = new List<Vector3>();
+            
+            var scale = 0.4f;
+            var offset = new Vector3(0, 0, 0);
+            
+            for (var i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                
+                if (line.StartsWith("---"))
                 {
+                    var color = line.Substring(3).Replace(" ", "");
+                    if(color.Length == 6)
+                    {
+                        brush.ColorString = color;
+                    }
+
+                    if (pts.Count < 1)
+                    {
+                        continue;
+                    }
+
                     await AddLineRendererAnim(pts, brush);
                     pts.Clear();
                     continue;
                 }
-                pts.Add(pt);
+                
+                var split = line.Split(' ');
+                if (split.Length < 3) continue;
+                var x = float.Parse(split[0]) * scale + offset.x;
+                var y = float.Parse(split[1]) * scale + offset.y;
+                var z = float.Parse(split[2]) * scale + offset.z;
+                pts.Add(new Vector3(x, y, z));
             }
         }
 
@@ -468,7 +505,7 @@ namespace Scribble
         public void OnGameStarted()
         {
             BeatmapObjectSpawnController spawnController = FindObjectOfType<BeatmapObjectSpawnController>();
-            UpdateMaterials(spawnController.currentBpm / 60);
+            // UpdateMaterials(spawnController.currentBpm / 60);
         }
 
         public void Dispose()

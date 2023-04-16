@@ -6,17 +6,16 @@ using IPA.Loader;
 using IPA.Logging;
 using Scribble.Stores;
 using SiraUtil;
+using Zenject;
 
 namespace Scribble.Installers
 {
-    internal class PluginAppInstaller : Zenject.Installer
+    internal class PluginAppInstaller : Installer
     {
-        private readonly Logger _logger;
         private readonly PluginConfig _config;
 
-        public PluginAppInstaller(Logger logger, PluginConfig config, PluginMetadata metadata)
+        public PluginAppInstaller(PluginConfig config, PluginMetadata metadata)
         {
-            _logger = logger;
             _config = config;
 
             if (_config.LastUsedVersion == "0.0.0") _config.FirstTimeLaunch = true;
@@ -25,7 +24,6 @@ namespace Scribble.Installers
 
         public override void InstallBindings()
         {
-            Container.BindLoggerAsSiraLogger(_logger);
             Container.BindInstance(_config);
             Container.Bind<PluginDirectories>().AsSingle();
 
@@ -44,8 +42,10 @@ namespace Scribble.Installers
             Container.BindInterfacesAndSelfTo<BrushStore>().AsSingle();
             Container.BindInterfacesAndSelfTo<ScribbleContainer>().FromNewComponentOnNewGameObject().AsSingle();
             Container.Bind<SaveSystem>().AsSingle();
+            Container.Bind<PrimitiveMeshLoader>().AsSingle();
+            Container.Bind<BrushMeshDrawer>().AsTransient();
 
-            Container.BindInterfacesAndSelfTo<Initializer>().AsSingle();
+            Container.Bind<Initializer>().AsSingle();
         }
     }
 }

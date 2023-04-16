@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Scribble.Effects;
 using Scribble.Stores;
@@ -45,6 +46,8 @@ namespace Scribble
 
         [IniParsable]
         public Vector2 Tiling { get; set; }
+        
+        public Dictionary<string, string> CustomEffectProperties = new Dictionary<string, string>();
 
         public CustomBrush()
         {

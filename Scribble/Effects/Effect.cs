@@ -23,7 +23,7 @@ namespace Scribble.Effects
             var mat = new Material(Shader);
             mat.SetColor("_Color", brush.Color);
             var tex = BrushTextures.GetTexture(brush.TextureName);
-            if (tex != null) mat.SetTexture("_Tex", tex);
+            if (tex) mat.SetTexture("_Tex", tex);
             mat.SetVector("_Tiling", brush.Tiling);
             mat.SetFloat("_Glow", brush.Glow);
             return mat;

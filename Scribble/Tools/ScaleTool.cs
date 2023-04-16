@@ -1,9 +1,9 @@
-﻿using Scribble.Helpers;
+using Scribble.Helpers;
 using UnityEngine;
 
 namespace Scribble.Tools
 {
-    internal class MoveTool : ITool
+    internal class ScaleTool : ITool
     {
         private BrushMeshDrawer _brushDrawer;
         private ScribbleContainer _scribbleContainer;
@@ -16,7 +16,7 @@ namespace Scribble.Tools
         private Color _brushColor;
         
         private MaterialPropertyBlock _materialPropertyBlock = new MaterialPropertyBlock();
-
+        
         public void Init(BrushMeshDrawer brushDrawer, ScribbleContainer scribbleContainer, PluginConfig config, SaberType saberType)
         {
             _brushDrawer = brushDrawer;
@@ -41,7 +41,7 @@ namespace Scribble.Tools
 
         public void OnUpdate(Vector3 position)
         {
-            _scribbleContainer.Move((position - _grabPoint)*_config.MoveToolMultiplier);
+            _scribbleContainer.Scale((position - _grabPoint)*_config.ScaleToolMultiplier);
             _grabPoint = position;
         }
 
