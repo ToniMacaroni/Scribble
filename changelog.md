@@ -3,3 +3,4 @@
 - Added shader that has height / distance fog (using beat saber fog system)
 - Added scaling tool
 - Added line width tool
+- New brush indicators
