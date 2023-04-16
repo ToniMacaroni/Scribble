@@ -42,8 +42,10 @@ namespace Scribble.Installers
             Container.BindInterfacesAndSelfTo<BrushStore>().AsSingle();
             Container.BindInterfacesAndSelfTo<ScribbleContainer>().FromNewComponentOnNewGameObject().AsSingle();
             Container.Bind<SaveSystem>().AsSingle();
+            Container.Bind<PrimitiveMeshLoader>().AsSingle();
+            Container.Bind<BrushMeshDrawer>().AsTransient();
 
-            Container.BindInterfacesAndSelfTo<Initializer>().AsSingle();
+            Container.Bind<Initializer>().AsSingle();
         }
     }
 }

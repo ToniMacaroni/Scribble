@@ -58,9 +58,9 @@ namespace Scribble
 
             SetContext(_config.VisibleDuringPlay);
 
-            //MakeObject(@"C:\Users\Julian\Desktop\LineArt.obj");
+            //MakeSptObject(@"C:\Users\Julian\Desktop\Scribble_Points.spt");
             // LoadBundle();
-            // return;
+            //return;
 
             if (_config.FirstTimeLaunch)
             {
@@ -218,56 +218,79 @@ namespace Scribble
 
         public void Move(Vector3 pos)
         {
-            //transform.position = pos;
             foreach (Transform child in transform)
             {
                 child.position += pos;
             }
         }
 
-        // sus model import
-        public async void MakeObject(string fileName)
+        public void Scale(Vector3 pos)
+        {
+            foreach (Transform child in transform)
+            {
+                child.localScale += pos;
+            }
+        }
+
+        public void ScaleLineWidth(float multiplier)
+        {
+            foreach (var lr in _lineRenderers)
+            {
+                lr.LineRenderer.widthMultiplier += multiplier;
+                lr.Brush.Size += multiplier*(1/LineWidth);
+            }
+        }
+
+        public async void MakeSptObject(string filename)
         {
             var data = _saveSystem.LoadPngFromResource("first");
             var brush = data.LineRendererData[0].Brush.ToCustomBrush();
-            brush.ColorString = "#34ebd2";
-            brush.Glow = 0.8f;
-            brush.Size = 3;
-
-            // brush.ColorString = "#34ebd2";
-            // brush.Glow = 0;
-            // brush.Size = 23;
-            // brush.EffectName = "DotBPM";
-
-            var str = File.ReadAllText(fileName);
-
-            var pts = new List<Vector3>();
-
+            brush.ColorString = "#303030";
+            brush.Glow = 0f;
+            brush.Size = 100;
+            brush.EffectName = "Lit";
+            
+            // brush.CustomEffectProperties = new Dictionary<string, string>
+            // {
+            //     { "_FogScale", "1" }
+            // };
+            
+            var str = File.ReadAllText(filename);
             var lines = str.Split('\n');
-
-            var multi = 0.65f;
-
-            for (int i = 0; i < lines.Length; i++)
+            
+            var pts = new List<Vector3>();
+            
+            var scale = 0.4f;
+            var offset = new Vector3(0, 0, 0);
+            
+            for (var i = 0; i < lines.Length; i++)
             {
-                var l = lines[i];
-                if (l.Length < 2 || l[0] != 'v' || l[1] != ' ')
+                var line = lines[i];
+                
+                if (line.StartsWith("---"))
                 {
-                    if (pts.Count < 1) continue;
-                    await AddLineRendererAnim(pts, brush);
-                    pts.Clear();
-                    continue;
-                }
+                    var color = line.Substring(3).Replace(" ", "");
+                    if(color.Length == 6)
+                    {
+                        brush.ColorString = color;
+                    }
 
-                var strPts = l.Split(' ');
-                if (strPts.Length < 4) continue;
-                var pt = new Vector3(float.Parse(strPts[1]) * multi, float.Parse(strPts[2]) * multi, float.Parse(strPts[3]) * multi);
-                if (pts.Count > 1 && Vector3.Distance(pt, pts[pts.Count - 1]) > 0.1f)
-                {
+                    if (pts.Count < 1)
+                    {
+                        continue;
+                    }
+
                     await AddLineRendererAnim(pts, brush);
                     pts.Clear();
                     continue;
                 }
-                pts.Add(pt);
+                
+                var split = line.Split(' ');
+                if (split.Length < 3) continue;
+                var x = float.Parse(split[0]) * scale + offset.x;
+                var y = float.Parse(split[1]) * scale + offset.y;
+                var z = float.Parse(split[2]) * scale + offset.z;
+                pts.Add(new Vector3(x, y, z));
             }
         }
 

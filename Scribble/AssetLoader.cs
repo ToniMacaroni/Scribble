@@ -29,12 +29,21 @@ namespace Scribble
 
         public T LoadAsset<T>(string name) where T : UnityEngine.Object
         {
+            LoadIfNotLoaded();
             return _assetBundle.LoadAsset<T>(name);
         }
 
         public void Dispose()
         {
             _assetBundle.Unload(true);
+        }
+        
+        private void LoadIfNotLoaded()
+        {
+            if (!_assetBundle)
+            {
+                Load();
+            }
         }
     }
 }

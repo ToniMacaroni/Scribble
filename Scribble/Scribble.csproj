@@ -7,7 +7,7 @@
     <LocalRefsDir Condition="Exists('..\Refs')">..\Refs</LocalRefsDir>
     <BeatSaberDir>$(LocalRefsDir)</BeatSaberDir>
     <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
-    <Copyright>Copyright © Toni Macaroni 2021</Copyright>
+    <Copyright>Copyright © Toni Macaroni 2023</Copyright>
     <AssemblyName>Scribble</AssemblyName>
     <RootNamespace>Scribble</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -19,10 +19,6 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RESHARPER</DefineConstants>
-
-    <StartAction>Program</StartAction>
-    <StartProgram>Y:\Program Files %28x86%29\Steam\steam.exe</StartProgram>
-    <StartArguments>-applaunch 620980 -vrmode oculus --verbose fpfc</StartArguments>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -158,6 +154,10 @@
     <EmbeddedResource Include="Icons\bucket.png" />
     <EmbeddedResource Include="Icons\move.png" />
     <EmbeddedResource Include="manifest.json" />
+    <None Remove="Icons\Resize.png" />
+    <EmbeddedResource Include="Icons\resize.png" />
+    <None Remove="Icons\LineWidth.png" />
+    <EmbeddedResource Include="Icons\line-width.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icons\eraser.png" />
@@ -203,5 +203,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Stores\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\changelog.md">
+      <Link>changelog.md</Link>
+    </Content>
+    <Content Include="..\README.md">
+      <Link>README.md</Link>
+    </Content>
+    <Content Include="Scribble.csproj.user" />
   </ItemGroup>
 </Project>

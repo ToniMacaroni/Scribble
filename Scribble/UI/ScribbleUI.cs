@@ -136,8 +136,8 @@ namespace Scribble.UI
 
         private void SetupButton(ScribbleUISimpleButton button)
         {
-            button.RectTransform.Find("Underline").gameObject.SetActive(false);
-            button.RectTransform.Find("BG").GetComponent<ImageView>().SetSkew(0);
+            //button.RectTransform.Find("Underline").gameObject.SetActive(false);
+            //button.RectTransform.Find("BG").GetComponent<ImageView>().SetSkew(0);
         }
 
         private void ButtonClicked()

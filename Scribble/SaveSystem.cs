@@ -136,12 +136,12 @@ namespace Scribble
             public SerializableLineRendererData(ScribbleContainer.LinerendererData data)
             {
                 Vector3[] positions = new Vector3[data.LineRenderer.positionCount];
-                var relPos = data.LineRenderer.transform.position;
+                var transform = data.LineRenderer.transform;
                 data.LineRenderer.GetPositions(positions);
                 Positions = new SerializableVector3[positions.Length];
                 for (int i = 0; i < positions.Length; i++)
                 {
-                    Positions[i] = new SerializableVector3(positions[i] + relPos);
+                    Positions[i] = new SerializableVector3(transform.localToWorldMatrix.MultiplyPoint(positions[i]));
                 }
                 Brush = new SerializableBrush(data.Brush);
             }

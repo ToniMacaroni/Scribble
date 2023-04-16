@@ -75,11 +75,19 @@ namespace Scribble.Stores
                     data[brush.Name][keyName] = propertyInfo.GetValue(brush).ToString();
                 }
             }
+
+            foreach (var effectProperty in brush.CustomEffectProperties)
+            {
+                data[brush.Name][effectProperty.Key] = effectProperty.Value;
+            }
         }
 
         private CustomBrush ReadBrush(IniData data, string name)
         {
             CustomBrush brush = new CustomBrush();
+
+            var registeredProps = new List<string>();
+            
             foreach (PropertyInfo propertyInfo in typeof(CustomBrush).GetProperties())
             {
                 IniParsable parsable = propertyInfo.GetCustomAttribute<IniParsable>();
@@ -87,6 +95,9 @@ namespace Scribble.Stores
                 {
                     var keyName = !string.IsNullOrEmpty(parsable.Name) ? parsable.Name : propertyInfo.Name;
                     if (!data[name].ContainsKey(keyName)) continue;
+                    
+                    registeredProps.Add(keyName);
+                    
                     if (propertyInfo.PropertyType == typeof(string))
                     {
                         propertyInfo.SetValue(brush, data[name][keyName]);
@@ -117,6 +128,15 @@ namespace Scribble.Stores
                 }
             }
 
+            var customEffectsData = new Dictionary<string, string>();
+
+            foreach (var keyData in data[name])
+            {
+                if(registeredProps.Contains(keyData.KeyName)) continue;
+                customEffectsData.Add(keyData.KeyName, keyData.Value);
+            }
+            
+            brush.CustomEffectProperties = customEffectsData;
             brush.Name = name;
             return brush;
         }

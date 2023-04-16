@@ -4,7 +4,7 @@ namespace Scribble.Tools
 {
     internal interface ITool
     {
-        void Init(GameObject brushMesh, ScribbleContainer scribbleContainer, SaberType saberType);
+        void Init(BrushMeshDrawer brushDrawer, ScribbleContainer scribbleContainer, PluginConfig config, SaberType saberType);
 
         void OnSelected();
 
@@ -25,5 +25,7 @@ namespace Scribble.Tools
         void OnUp(Vector3 position);
 
         void OnDeselected();
+
+        void Render();
     }
 }

@@ -1,9 +1,9 @@
-﻿using Scribble.Helpers;
+using Scribble.Helpers;
 using UnityEngine;
 
 namespace Scribble.Tools
 {
-    internal class MoveTool : ITool
+    internal class LineWidthTool : ITool
     {
         private BrushMeshDrawer _brushDrawer;
         private ScribbleContainer _scribbleContainer;
@@ -41,7 +41,7 @@ namespace Scribble.Tools
 
         public void OnUpdate(Vector3 position)
         {
-            _scribbleContainer.Move((position - _grabPoint)*_config.MoveToolMultiplier);
+            _scribbleContainer.ScaleLineWidth(Vector3.Dot(Vector3.one, position - _grabPoint) * _config.ScaleLineWidthToolMultiplier);
             _grabPoint = position;
         }
 
