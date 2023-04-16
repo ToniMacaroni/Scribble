@@ -18,7 +18,7 @@ Click ones to switch them on, click again to swith them off.
 
 ## Configuration
 The path to the configuration file is `Beat Saber/UserData/Scribble.json`
-```csharp
+```c
 bool       VisibleDuringPlay              //Is the drawing visible during gameplay
 bool       LoadDrawingsAnimated           //Should the drawings be loaded in with animation
 int        ThumbnailSize                  //Resolution of the thumbnails
